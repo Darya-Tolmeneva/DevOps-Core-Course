@@ -2,7 +2,7 @@
 
 ## Docker Best Practices Applied
 
-###🔹 Non-root user
+### 🔹 Non-root user
 **Practice:** The container runs the application as a non-root user.
 
 **Why it matters:**
