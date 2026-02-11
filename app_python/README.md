@@ -1,5 +1,7 @@
 # DevOps Info Service
 
+![CI Workflow](https://github.com/Darya-Tolmeneva/DevOps-Core-Course/actions/workflows/python-ci.yml/badge.svg)
+
 A lightweight Python web application that provides system, runtime, and service information via HTTP endpoints.  
 Developed as part of **Lab 01 — Python Web Application** for a DevOps course.
 

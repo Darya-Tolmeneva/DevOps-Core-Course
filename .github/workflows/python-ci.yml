@@ -34,6 +34,12 @@ jobs:
 
       - name: Run tests
         run: pytest app_python/tests -v --disable-warnings
+      - name: Run Snyk security scan
+        uses: snyk/actions@v2
+        with:
+          command: test
+          severity-threshold: high
+          token: ${{ secrets.SNYK_TOKEN }}
 
   docker-build-and-push:
     runs-on: ubuntu-latest
