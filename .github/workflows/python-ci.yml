@@ -30,7 +30,7 @@ jobs:
           pip install ruff
 
       - name: Run linter (ruff)
-        run: ruff app_python
+        run: python -m ruff app_python
 
       - name: Run tests
         run: pytest app_python/tests -v --disable-warnings
