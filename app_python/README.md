@@ -29,3 +29,26 @@ python -m venv venv
 source venv/bin/activate   # Linux / macOS
 pip install -r requirements.txt
 ```
+---
+
+## Docker
+
+This application can be built and run using Docker.
+
+### Build the image locally
+
+Use the Docker build command to create an image from the Dockerfile:
+
+`docker build -t <image-name> <path-to-app>`
+
+### Run the container
+
+Run the container with port mapping to access the service from the host machine:
+
+`docker run -p <host-port>:<container-port> <image-name>`
+
+### Pull the image from Docker Hub
+
+The image can be pulled from Docker Hub using:
+
+`docker pull <dockerhub-username>/<repository>:<tag>`
