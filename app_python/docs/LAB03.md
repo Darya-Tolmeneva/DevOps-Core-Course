@@ -92,7 +92,7 @@ PYTHONPATH=. pytest --cov=app_python --cov-report=term-missing
 
 ## Terminal Output 
 
-![[screenshots/lab3_tests.png]]
+![img](screenshots/lab3_tests.png)
 
 ## GitHub Actions CI Workflow
 
@@ -130,13 +130,15 @@ The workflow is triggered on `push` and `pull_request` events for the `mast
 - **Reasoning:** This strategy provides both a stable, timestamped version and an always-current version for easy deployment.
 
 [Link](https://github.com/Darya-Tolmeneva/DevOps-Core-Course/actions/runs/21921482124)
-![[screenshots/lab3_ci.png]]
+
+
+![img](screenshots/lab3_ci.png)
 
 
 ## CI Workflow Optimization & Security
 
 ### Status Badge
-![[screenshots/lab3_badge.png]]
+![img](screenshots/lab3_badge.png)
 
 - Added a GitHub Actions status badge to the `app_python/README.md`:
     
