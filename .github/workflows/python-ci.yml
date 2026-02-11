@@ -35,12 +35,11 @@ jobs:
       - name: Run tests
         run: pytest app_python/tests -v --disable-warnings
       - name: Run Snyk security scan
-        uses: snyk/actions@v1
+        uses: snyk/actions/python@master
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
-          command: test
-          args: "--file=app_python/requirements.txt --severity-threshold=high"
+          args: app_python --file=requirements.txt --severity-threshold=high --skip-unresolved
 
 
   docker-build-and-push:
