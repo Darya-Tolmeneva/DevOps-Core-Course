@@ -21,7 +21,7 @@
 
 ---
 
-##Test Structure
+## Test Structure
 
 ```
 app_python/
@@ -58,7 +58,7 @@ app_python/
 
 ---
 
-##How to Run Tests Locally
+## How to Run Tests Locally
 
 1. Activate the virtual environment:
     
@@ -92,7 +92,7 @@ PYTHONPATH=. pytest --cov=app_python --cov-report=term-missing
 
 ## Terminal Output 
 
-![[lab3_tests.png]]
+![[screenshots/lab3_tests.png]]
 
 ## GitHub Actions CI Workflow
 
@@ -130,13 +130,13 @@ The workflow is triggered on `push` and `pull_request` events for the `mast
 - **Reasoning:** This strategy provides both a stable, timestamped version and an always-current version for easy deployment.
 
 [Link](https://github.com/Darya-Tolmeneva/DevOps-Core-Course/actions/runs/21921482124)
-![[lab3_ci.png]]
+![[screenshots/lab3_ci.png]]
 
 
 ## CI Workflow Optimization & Security
 
 ### Status Badge
-![[lab3_badge.png]]
+![[screenshots/lab3_badge.png]]
 
 - Added a GitHub Actions status badge to the `app_python/README.md`:
     
