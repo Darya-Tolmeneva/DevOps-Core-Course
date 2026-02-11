@@ -27,6 +27,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r app_python/requirements.txt
           pip install -r app_python/requirements-dev.txt
+          pip install ruff
 
       - name: Run linter (ruff)
         run: ruff app_python
