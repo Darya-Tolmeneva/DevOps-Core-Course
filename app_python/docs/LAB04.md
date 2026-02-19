@@ -85,7 +85,7 @@ The following resources were provisioned using Terraform:
 
 Terraform CLI version:
 
-![version](tf_version.png)
+![version](screenshots/tf_version.png)
 
 ---
 
@@ -152,7 +152,7 @@ These issues helped deepen understanding of:
 
 ### terraform init
 
-![init](tf_init.png)
+![init](screenshots/tf_init.png)
 ---
 
 ### terraform plan (sanitized)
@@ -766,7 +766,8 @@ Destroy complete! Resources: 4 destroyed.
   * Required creating boot disk as a separate resource (`ComputeDisk`) instead of using `initialize_params`.
   * Adjusting Security Group syntax to use `VpcSecurityGroupIngressArgs` / `EgressArgs`.
 * **Terminal Output Examples:**
-![up](plumni_up.png)
+  
+![up](screenshots/plumni_up.png)
 
 ---
 
