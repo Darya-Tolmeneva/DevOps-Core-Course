@@ -183,7 +183,7 @@ Terraform will perform the following actions:
       + maintenance_policy        = (known after apply)
       + metadata                  = {
           + "ssh-keys" = <<-EOT
-                ubuntu:ssh-ed25519 **** tolmeneva05@mail.ru
+                ubuntu:ssh-ed25519 ******
             EOT
         }
       + name                      = "terraform-vm"
