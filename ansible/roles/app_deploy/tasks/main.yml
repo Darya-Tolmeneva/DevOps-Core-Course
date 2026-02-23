@@ -1,0 +1,55 @@
+---
+- name: Log in to Docker Hub
+  community.docker.docker_login:
+    username: "{{ dockerhub_username }}"
+    password: "{{ dockerhub_password }}"
+  become: true
+
+- name: Pull Docker image
+  community.docker.docker_image:
+    name: "{{ app_full_image }}"
+    source: pull
+  become: true
+
+- name: Stop existing container (if running)
+  community.docker.docker_container:
+    name: "{{ app_container_name }}"
+    state: stopped
+  ignore_errors: true
+  become: true
+
+- name: Remove old container (if exists)
+  community.docker.docker_container:
+    name: "{{ app_container_name }}"
+    state: absent
+  ignore_errors: true
+  become: true
+
+- name: Run new container
+  community.docker.docker_container:
+    name: "{{ app_container_name }}"
+    image: "{{ app_full_image }}"
+    state: started
+    restart_policy: "{{ app_restart_policy }}"
+    published_ports:
+      - "{{ app_port }}:{{ app_port }}"
+    env: "{{ app_env }}"
+  notify: restart application container
+  become: true
+
+- name: Wait for application port to be open
+  wait_for:
+    port: "{{ app_port }}"
+    host: "127.0.0.1"
+    delay: 3
+    timeout: 60
+
+- name: Verify health endpoint
+  uri:
+    url: "http://127.0.0.1:{{ app_port }}/health"
+    method: GET
+    status_code: 200
+  register: healthcheck
+  retries: 5
+  delay: 5
+  until: healthcheck.status == 200
