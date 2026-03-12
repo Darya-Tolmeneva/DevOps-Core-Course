@@ -5,11 +5,17 @@ import logging
 from datetime import datetime, timezone
 
 from flask import Flask, jsonify, request
+from pythonjsonlogger import jsonlogger
 
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+logHandler = logging.StreamHandler()
+formatter = jsonlogger.JsonFormatter(
+    "%(asctime)s %(levelname)s %(name)s %(message)s"
 )
-logger = logging.getLogger(__name__)
+logHandler.setFormatter(formatter)
+
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+logger.addHandler(logHandler)
 
 
 app = Flask(__name__)
@@ -39,6 +45,28 @@ def get_system_info():
         "python_version": platform.python_version(),
     }
 
+@app.before_request
+def log_request():
+    logger.info(
+        "request_received",
+        extra={
+            "method": request.method,
+            "path": request.path,
+            "client_ip": request.remote_addr,
+        },
+    )
+
+@app.after_request
+def log_response(response):
+    logger.info(
+        "response_sent",
+        extra={
+            "method": request.method,
+            "path": request.path,
+            "status": response.status_code,
+        },
+    )
+    return response
 
 @app.route("/", methods=["GET"])
 def index():
