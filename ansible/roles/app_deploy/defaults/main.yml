@@ -1,8 +1,14 @@
 ---
 app_port: 5000
+app_internal_port: 5000
 app_restart_policy: unless-stopped
 
 app_env: {}
 
 app_container_name: "{{ app_name }}"
 app_full_image: "{{ docker_image }}:{{ docker_image_tag }}"
+
+compose_project_dir: "/opt/{{ app_name }}"
+docker_compose_version: "3.8"
+
+app_deploy_wipe: false
