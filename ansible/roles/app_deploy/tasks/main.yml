@@ -14,23 +14,28 @@
       community.docker.docker_login:
         username: "{{ dockerhub_username }}"
         password: "{{ dockerhub_token }}"
-      no_log: false
+      no_log: true
 
     - name: App deploy | create application directory
       ansible.builtin.file:
-        path: "{{ compose_project_dir }}"
+        path: "{{ app_deploy_compose_project_dir }}"
         state: directory
         mode: "0755"
 
     - name: App deploy | template docker-compose file
       ansible.builtin.template:
         src: docker-compose.yml.j2
-        dest: "{{ compose_project_dir }}/docker-compose.yml"
+        dest: "{{ app_deploy_compose_project_dir }}/docker-compose.yml"
         mode: "0644"
+
+    - name: App deploy | remove old standalone container
+      community.docker.docker_container:
+        name: "{{ app_container_name }}"
+        state: absent
 
     - name: App deploy | deploy compose project
       community.docker.docker_compose_v2:
-        project_src: "{{ compose_project_dir }}"
+        project_src: "{{ app_deploy_compose_project_dir }}"
         state: present
         pull: always
 
@@ -46,10 +51,10 @@
         url: "http://127.0.0.1:{{ app_port }}/health"
         method: GET
         status_code: 200
-      register: healthcheck
+      register: app_deploy_healthcheck
       retries: 5
       delay: 5
-      until: healthcheck.status == 200
+      until: app_deploy_healthcheck.status == 200
 
   rescue:
     - name: App deploy | deployment failed
@@ -59,4 +64,4 @@
   always:
     - name: App deploy | show compose project directory
       ansible.builtin.debug:
-        msg: "Compose project directory: {{ compose_project_dir }}"
+        msg: "Compose project directory: {{ app_deploy_compose_project_dir }}"

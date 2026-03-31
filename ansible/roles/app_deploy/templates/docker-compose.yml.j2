@@ -1,6 +1,6 @@
 services:
   {{ app_container_name }}:
-    image: {{ app_full_image | to_json }}
+    image: {{ app_deploy_full_image | to_json }}
     container_name: {{ app_container_name | to_json }}
     ports:
       - "{{ app_port }}:{{ app_internal_port }}"

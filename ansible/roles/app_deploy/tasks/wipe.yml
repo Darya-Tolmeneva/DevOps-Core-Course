@@ -1,25 +1,25 @@
 ---
 - name: App deploy | wipe application
-  tags:
-    - app_deploy_wipe
   become: true
   when: app_deploy_wipe | bool
+  tags:
+    - app_deploy_wipe
   block:
     - name: App deploy | stop and remove compose project
       community.docker.docker_compose_v2:
-        project_src: "{{ compose_project_dir }}"
+        project_src: "{{ app_deploy_compose_project_dir }}"
         state: absent
-      register: compose_wipe_result
+      register: app_deploy_compose_wipe_result
       failed_when: false
 
     - name: App deploy | remove docker-compose file
       ansible.builtin.file:
-        path: "{{ compose_project_dir }}/docker-compose.yml"
+        path: "{{ app_deploy_compose_project_dir }}/docker-compose.yml"
         state: absent
 
     - name: App deploy | remove application directory
       ansible.builtin.file:
-        path: "{{ compose_project_dir }}"
+        path: "{{ app_deploy_compose_project_dir }}"
         state: absent
 
     - name: App deploy | wipe completed
