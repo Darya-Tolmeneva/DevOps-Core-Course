@@ -6,13 +6,11 @@ on:
     paths:
       - 'ansible/**'
       - '!ansible/docs/**'
-      - '.github/workflows/ansible-deploy.yml'
   pull_request:
     branches: [main, master]
     paths:
       - 'ansible/**'
       - '!ansible/docs/**'
-      - '.github/workflows/ansible-deploy.yml'
 
 jobs:
   lint:
