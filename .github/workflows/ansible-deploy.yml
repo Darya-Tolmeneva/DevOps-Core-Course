@@ -35,8 +35,8 @@ jobs:
 
       - name: Create vault password file
         run: |
-          printf '%s' "${{ secrets.ANSIBLE_VAULT_PASSWORD }}" > .vault_pass
-          chmod 600 .vault_pass
+          printf '%s' "${{ secrets.ANSIBLE_VAULT_PASSWORD }}" > ansible/.vault_pass
+          chmod 600 ansible/.vault_pass
 
       - name: Run ansible-lint
         run: |
@@ -80,14 +80,13 @@ jobs:
 
       - name: Create vault password file
         run: |
-          printf '%s' "${{ secrets.ANSIBLE_VAULT_PASSWORD }}" > .vault_pass
-          chmod 600 .vault_pass
+          printf '%s' "${{ secrets.ANSIBLE_VAULT_PASSWORD }}" > ansible/.vault_pass
+          chmod 600 ansible/.vault_pass
 
       - name: Deploy with Ansible
         run: |
           cd ansible
-          ansible-playbook playbooks/deploy.yml \
-            --vault-password-file ../.vault_pass
+          ansible-playbook playbooks/deploy.yml
 
       - name: Verify application
         run: |
