@@ -1,4 +1,10 @@
 app_name: python-service
+app_port: 5000
+app_internal_port: 5000
+app_restart_policy: unless-stopped
+app_env: {}
+app_container_name: "{{ app_name }}"
+
 docker_image: din19pg/python-service
 docker_image_tag: latest
 dockerhub_username: din19pg
