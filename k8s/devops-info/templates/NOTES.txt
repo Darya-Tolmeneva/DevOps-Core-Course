@@ -1,0 +1,6 @@
+Your devops-info release has been installed.
+
+To check the deployment, run:
+
+  kubectl get pods
+  kubectl get svc
