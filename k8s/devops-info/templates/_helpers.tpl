@@ -50,3 +50,16 @@ app.kubernetes.io/name: {{ include "devops-info.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
+{{/*
+Secrets
+*/}}
+{{- define "devops-info.secretName" -}}
+{{- default (printf "%s-secret" (include "devops-info.fullname" .)) .Values.secret.name -}}
+{{- end }}
+
+{{- define "devops-info.commonEnv" -}}
+- name: PORT
+  value: {{ (index .Values.env 0).value | quote }}
+- name: DEBUG
+  value: {{ (index .Values.env 1).value | quote }}
+{{- end }}

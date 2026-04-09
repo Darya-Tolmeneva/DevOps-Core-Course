@@ -8,7 +8,7 @@ image:
 service:
   type: NodePort
   port: 80
-  targetPort: 5000
+  targetPort: 8000
   nodePort: 30007
 
 resources:
@@ -21,7 +21,7 @@ resources:
 
 env:
   - name: PORT
-    value: "5000"
+    value: "8000"
   - name: DEBUG
     value: "false"
 
@@ -38,3 +38,8 @@ readinessProbe:
     port: 8000
   initialDelaySeconds: 5
   periodSeconds: 3
+
+vault:
+  enabled: true
+  role: "devops-info"
+  secretPath: "secret/data/myapp/config"
