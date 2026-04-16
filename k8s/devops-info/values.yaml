@@ -8,7 +8,7 @@ image:
 service:
   type: NodePort
   port: 80
-  targetPort: 8000
+  targetPort: 5000
   nodePort: 30007
 
 resources:
@@ -21,21 +21,21 @@ resources:
 
 env:
   - name: PORT
-    value: "8000"
+    value: "5000"
   - name: DEBUG
     value: "false"
 
 livenessProbe:
   httpGet:
     path: /health
-    port: 8000
+    port: 5000
   initialDelaySeconds: 10
   periodSeconds: 5
 
 readinessProbe:
   httpGet:
     path: /health
-    port: 8000
+    port: 5000
   initialDelaySeconds: 5
   periodSeconds: 3
 
@@ -43,3 +43,17 @@ vault:
   enabled: true
   role: "devops-info"
   secretPath: "secret/data/myapp/config"
+
+app:
+  environment: dev
+  logLevel: INFO
+  dataDir: /data
+
+persistence:
+  enabled: true
+  size: 100Mi
+  storageClass: ""
+
+secret:
+  create: false
+  name: devops-info-secret

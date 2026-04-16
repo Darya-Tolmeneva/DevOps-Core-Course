@@ -16,7 +16,7 @@ resources:
 service:
   type: LoadBalancer
   port: 80
-  targetPort: 8000
+  targetPort: 5000
 
 livenessProbe:
   initialDelaySeconds: 30
@@ -25,3 +25,17 @@ livenessProbe:
 readinessProbe:
   initialDelaySeconds: 10
   periodSeconds: 3
+
+app:
+  environment: prod
+  logLevel: INFO
+  dataDir: /data
+
+persistence:
+  enabled: true
+  size: 200Mi
+  storageClass: ""
+
+secret:
+  create: false
+  name: devops-info-secret

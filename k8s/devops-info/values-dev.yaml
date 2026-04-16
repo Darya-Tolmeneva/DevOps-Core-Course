@@ -3,7 +3,7 @@ replicaCount: 1
 image:
   repository: din19pg/python-service
   tag: "latest"
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
 
 resources:
   limits:
@@ -16,7 +16,7 @@ resources:
 service:
   type: NodePort
   port: 80
-  targetPort: 8000
+  targetPort: 5000
 
 livenessProbe:
   initialDelaySeconds: 5
@@ -25,3 +25,17 @@ livenessProbe:
 readinessProbe:
   initialDelaySeconds: 5
   periodSeconds: 5
+
+app:
+  environment: dev
+  logLevel: DEBUG
+  dataDir: /data
+
+persistence:
+  enabled: true
+  size: 100Mi
+  storageClass: ""
+
+secret:
+  create: false
+  name: devops-info-secret
