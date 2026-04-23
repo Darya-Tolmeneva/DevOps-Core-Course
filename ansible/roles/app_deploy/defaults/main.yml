@@ -1,0 +1,8 @@
+---
+app_port: 5000
+app_restart_policy: unless-stopped
+
+app_env: {}
+
+app_container_name: "{{ app_name }}"
+app_full_image: "{{ docker_image }}:{{ docker_image_tag }}"
