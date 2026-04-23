@@ -3,6 +3,8 @@ import socket
 import platform
 import logging
 from datetime import datetime, timezone
+from prometheus_client import Counter, Histogram, Gauge, generate_latest, CONTENT_TYPE_LATEST
+import time
 
 from flask import Flask, jsonify, request
 from pythonjsonlogger import jsonlogger
@@ -19,6 +21,23 @@ logger.addHandler(logHandler)
 
 
 app = Flask(__name__)
+
+http_requests_total = Counter(
+    "http_requests_total",
+    "Total HTTP requests",
+    ["method", "endpoint", "status"]
+)
+
+http_request_duration_seconds = Histogram(
+    "http_request_duration_seconds",
+    "HTTP request duration in seconds",
+    ["method", "endpoint"]
+)
+
+http_requests_in_progress = Gauge(
+    "http_requests_in_progress",
+    "Number of HTTP requests in progress"
+)
 
 HOST = os.getenv("HOST", "0.0.0.0")
 PORT = int(os.getenv("PORT", 5000))
@@ -47,6 +66,9 @@ def get_system_info():
 
 @app.before_request
 def log_request():
+    request.start_time = time.time()
+    http_requests_in_progress.inc()
+
     logger.info(
         "request_received",
         extra={
@@ -58,6 +80,21 @@ def log_request():
 
 @app.after_request
 def log_response(response):
+    duration = time.time() - request.start_time
+
+    http_requests_total.labels(
+        method=request.method,
+        endpoint=request.path,
+        status=response.status_code
+    ).inc()
+
+    http_request_duration_seconds.labels(
+        method=request.method,
+        endpoint=request.path
+    ).observe(duration)
+
+    http_requests_in_progress.dec()
+
     logger.info(
         "response_sent",
         extra={
@@ -130,6 +167,10 @@ def internal_error(error):
         ),
         500,
     )
+
+@app.route("/metrics")
+def metrics():
+    return generate_latest(), 200, {"Content-Type": CONTENT_TYPE_LATEST}
 
 
 if __name__ == "__main__":
