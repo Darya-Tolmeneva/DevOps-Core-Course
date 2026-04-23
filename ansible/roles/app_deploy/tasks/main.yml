@@ -1,55 +1,67 @@
 ---
-- name: Log in to Docker Hub
-  community.docker.docker_login:
-    username: "{{ dockerhub_username }}"
-    password: "{{ dockerhub_password }}"
+- name: App deploy | include wipe tasks
+  ansible.builtin.include_tasks: wipe.yml
+  tags:
+    - app_deploy_wipe
+
+- name: App deploy | deploy application with Docker Compose
   become: true
+  tags:
+    - app_deploy
+    - compose
+  block:
+    - name: App deploy | log in to Docker Hub
+      community.docker.docker_login:
+        username: "{{ dockerhub_username }}"
+        password: "{{ dockerhub_token }}"
+      no_log: true
 
-- name: Pull Docker image
-  community.docker.docker_image:
-    name: "{{ app_full_image }}"
-    source: pull
-  become: true
+    - name: App deploy | create application directory
+      ansible.builtin.file:
+        path: "{{ app_deploy_compose_project_dir }}"
+        state: directory
+        mode: "0755"
 
-- name: Stop existing container (if running)
-  community.docker.docker_container:
-    name: "{{ app_container_name }}"
-    state: stopped
-  ignore_errors: true
-  become: true
+    - name: App deploy | template docker-compose file
+      ansible.builtin.template:
+        src: docker-compose.yml.j2
+        dest: "{{ app_deploy_compose_project_dir }}/docker-compose.yml"
+        mode: "0644"
 
-- name: Remove old container (if exists)
-  community.docker.docker_container:
-    name: "{{ app_container_name }}"
-    state: absent
-  ignore_errors: true
-  become: true
+    - name: App deploy | remove old standalone container
+      community.docker.docker_container:
+        name: "{{ app_container_name }}"
+        state: absent
 
-- name: Run new container
-  community.docker.docker_container:
-    name: "{{ app_container_name }}"
-    image: "{{ app_full_image }}"
-    state: started
-    restart_policy: "{{ app_restart_policy }}"
-    published_ports:
-      - "{{ app_port }}:{{ app_port }}"
-    env: "{{ app_env }}"
-  notify: restart application container
-  become: true
+    - name: App deploy | deploy compose project
+      community.docker.docker_compose_v2:
+        project_src: "{{ app_deploy_compose_project_dir }}"
+        state: present
+        pull: always
 
-- name: Wait for application port to be open
-  wait_for:
-    port: "{{ app_port }}"
-    host: "127.0.0.1"
-    delay: 3
-    timeout: 60
+    - name: App deploy | wait for application port
+      ansible.builtin.wait_for:
+        host: "127.0.0.1"
+        port: "{{ app_port }}"
+        delay: 3
+        timeout: 60
 
-- name: Verify health endpoint
-  uri:
-    url: "http://127.0.0.1:{{ app_port }}/health"
-    method: GET
-    status_code: 200
-  register: healthcheck
-  retries: 5
-  delay: 5
-  until: healthcheck.status == 200
+    - name: App deploy | verify health endpoint
+      ansible.builtin.uri:
+        url: "http://127.0.0.1:{{ app_port }}/health"
+        method: GET
+        status_code: 200
+      register: app_deploy_healthcheck
+      retries: 5
+      delay: 5
+      until: app_deploy_healthcheck.status == 200
+
+  rescue:
+    - name: App deploy | deployment failed
+      ansible.builtin.debug:
+        msg: "Deployment failed for {{ app_name }}"
+
+  always:
+    - name: App deploy | show compose project directory
+      ansible.builtin.debug:
+        msg: "Compose project directory: {{ app_deploy_compose_project_dir }}"

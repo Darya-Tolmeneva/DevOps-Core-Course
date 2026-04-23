@@ -1,0 +1,9 @@
+services:
+  {{ app_container_name }}:
+    image: {{ app_deploy_full_image | to_json }}
+    container_name: {{ app_container_name | to_json }}
+    ports:
+      - "{{ app_port }}:{{ app_internal_port }}"
+    environment:
+      APP_SECRET_KEY: {{ app_secret_key | to_json }}
+    restart: {{ app_restart_policy | to_json }}
