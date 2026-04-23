@@ -53,7 +53,7 @@ DEBUG = os.getenv("DEBUG", "False").lower() == "true"
 
 START_TIME = datetime.now(timezone.utc)
 
-DATA_DIR = os.getenv("DATA_DIR", "/data")
+DATA_DIR = os.getenv("DATA_DIR", os.path.join(os.getcwd(), "data"))
 VISITS_FILE = os.path.join(DATA_DIR, "visits")
 visits_lock = Lock()
 
