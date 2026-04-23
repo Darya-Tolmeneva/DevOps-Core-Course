@@ -13,12 +13,15 @@ from pythonjsonlogger import jsonlogger
 
 
 logging.basicConfig(
-	level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
+
 logHandler = logging.StreamHandler()
 formatter = jsonlogger.JsonFormatter(
     "%(asctime)s %(levelname)s %(name)s %(message)s"
-
 )
+
 logHandler.setFormatter(formatter)
 
 logger = logging.getLogger()
