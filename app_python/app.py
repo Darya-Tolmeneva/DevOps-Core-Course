@@ -3,16 +3,46 @@ import socket
 import platform
 import logging
 from datetime import datetime, timezone
+
 from threading import Lock
+from prometheus_client import Counter, Histogram, Gauge, generate_latest, CONTENT_TYPE_LATEST
+import time
 
 from flask import Flask, jsonify, request
+from pythonjsonlogger import jsonlogger
+
 
 logging.basicConfig(
 	level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+logHandler = logging.StreamHandler()
+formatter = jsonlogger.JsonFormatter(
+    "%(asctime)s %(levelname)s %(name)s %(message)s"
+
 )
-logger = logging.getLogger(__name__)
+logHandler.setFormatter(formatter)
+
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+logger.addHandler(logHandler)
 
 app = Flask(__name__)
+
+http_requests_total = Counter(
+    "http_requests_total",
+    "Total HTTP requests",
+    ["method", "endpoint", "status"]
+)
+
+http_request_duration_seconds = Histogram(
+    "http_request_duration_seconds",
+    "HTTP request duration in seconds",
+    ["method", "endpoint"]
+)
+
+http_requests_in_progress = Gauge(
+    "http_requests_in_progress",
+    "Number of HTTP requests in progress"
+)
 
 HOST = os.getenv("HOST", "0.0.0.0")
 PORT = int(os.getenv("PORT", 5000))
@@ -84,6 +114,46 @@ def get_system_info():
 		"python_version": platform.python_version(),
 	}
 
+@app.before_request
+def log_request():
+    request.start_time = time.time()
+    http_requests_in_progress.inc()
+
+    logger.info(
+        "request_received",
+        extra={
+            "method": request.method,
+            "path": request.path,
+            "client_ip": request.remote_addr,
+        },
+    )
+
+@app.after_request
+def log_response(response):
+    duration = time.time() - request.start_time
+
+    http_requests_total.labels(
+        method=request.method,
+        endpoint=request.path,
+        status=response.status_code
+    ).inc()
+
+    http_request_duration_seconds.labels(
+        method=request.method,
+        endpoint=request.path
+    ).observe(duration)
+
+    http_requests_in_progress.dec()
+
+    logger.info(
+        "response_sent",
+        extra={
+            "method": request.method,
+            "path": request.path,
+            "status": response.status_code,
+        },
+    )
+    return response
 
 @app.route("/", methods=["GET"])
 def index():
@@ -164,6 +234,10 @@ def internal_error(error):
 		),
 		500,
 	)
+
+@app.route("/metrics")
+def metrics():
+    return generate_latest(), 200, {"Content-Type": CONTENT_TYPE_LATEST}
 
 
 if __name__ == "__main__":

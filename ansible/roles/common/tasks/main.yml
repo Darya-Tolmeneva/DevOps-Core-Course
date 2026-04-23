@@ -1,0 +1,58 @@
+---
+- name: Common | package tasks
+  become: true
+  tags:
+    - common
+    - packages
+  block:
+    - name: Common | wait for apt lock to be released
+      ansible.builtin.shell: |
+        while fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1; do
+          sleep 5
+        done
+      changed_when: false
+
+    - name: Common | update apt cache
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 3600
+
+    - name: Common | install essential packages
+      ansible.builtin.apt:
+        name: "{{ common_packages }}"
+        state: present
+
+    - name: Common | set timezone
+      community.general.timezone:
+        name: "{{ common_timezone }}"
+
+  rescue:
+    - name: Common | refresh apt cache after failure
+      ansible.builtin.apt:
+        update_cache: true
+
+  always:
+    - name: Common | log package block completion
+      ansible.builtin.copy:
+        dest: /tmp/common-packages.log
+        content: "common packages block completed\n"
+        mode: "0644"
+
+- name: Common | user tasks
+  become: true
+  tags:
+    - common
+    - users
+  block:
+    - name: Common | ensure deploy user exists
+      ansible.builtin.user:
+        name: "{{ deploy_user }}"
+        shell: /bin/bash
+        create_home: true
+
+  always:
+    - name: Common | log user block completion
+      ansible.builtin.copy:
+        dest: /tmp/common-users.log
+        content: "common users block completed\n"
+        mode: "0644"
