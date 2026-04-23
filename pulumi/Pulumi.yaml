@@ -1,0 +1,11 @@
+name: vm_task2
+description: VM for task 2
+runtime:
+  name: python
+  options:
+    toolchain: pip
+    virtualenv: venv
+config:
+  pulumi:tags:
+    value:
+      pulumi:template: python
