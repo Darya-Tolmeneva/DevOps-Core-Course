@@ -5,13 +5,16 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-RUN useradd -m appuser
+RUN useradd -m appuser \
+    && mkdir -p /data \
+    && chown -R appuser:appuser /app /data
+
+COPY . .
+
 RUN chown -R appuser:appuser /app
 
 USER appuser
 
-COPY . .
-
-EXPOSE 8000
+EXPOSE 5000
 
 CMD ["python", "app.py"]
