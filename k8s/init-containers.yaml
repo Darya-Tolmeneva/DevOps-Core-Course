@@ -1,0 +1,57 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: lab16
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: init-demo
+  namespace: lab16
+  labels:
+    app: init-demo
+spec:
+  initContainers:
+    - name: wait-for-service
+      image: busybox:1.36
+      command:
+        - sh
+        - -c
+        - |
+          until nslookup kubernetes.default.svc.cluster.local; do
+            echo "waiting for kubernetes service"
+            sleep 2
+          done
+          echo "kubernetes service is reachable"
+
+    - name: init-download
+      image: busybox:1.36
+      command:
+        - sh
+        - -c
+        - |
+          wget -O /work-dir/index.html https://example.com
+          echo "download complete"
+          ls -la /work-dir
+      volumeMounts:
+        - name: workdir
+          mountPath: /work-dir
+
+  containers:
+    - name: main-app
+      image: busybox:1.36
+      command:
+        - sh
+        - -c
+        - |
+          echo "main container started"
+          echo "downloaded file:"
+          cat /data/index.html
+          sleep 3600
+      volumeMounts:
+        - name: workdir
+          mountPath: /data
+
+  volumes:
+    - name: workdir
+      emptyDir: {}
