@@ -1,0 +1,68 @@
+replicaCount: 3
+
+image:
+  repository: din19pg/python-service
+  tag: "latest"
+  pullPolicy: Always
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 5000
+
+deployment:
+  enabled: false
+
+rollout:
+  enabled: true
+  strategy: blueGreen
+
+statefulset:
+  enabled: false
+
+resources:
+  limits:
+    cpu: 200m
+    memory: 256Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+env:
+  - name: PORT
+    value: "5000"
+  - name: DEBUG
+    value: "false"
+
+livenessProbe:
+  httpGet:
+    path: /health
+    port: 5000
+  initialDelaySeconds: 10
+  periodSeconds: 5
+
+readinessProbe:
+  httpGet:
+    path: /health
+    port: 5000
+  initialDelaySeconds: 5
+  periodSeconds: 3
+
+vault:
+  enabled: true
+  role: "devops-info"
+  secretPath: "secret/data/myapp/config"
+
+app:
+  environment: dev
+  logLevel: INFO
+  dataDir: /data
+
+persistence:
+  enabled: true
+  size: 100Mi
+  storageClass: ""
+
+secret:
+  create: false
+  name: devops-info-secret
